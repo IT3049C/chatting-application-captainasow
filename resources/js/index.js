@@ -53,7 +53,52 @@ function fetchMessages() {
     }
   ];
 }
-function updateMessagesInChatBox() {
+function updateMessages() {
   const messages = fetchMessages();
-  
+  let formattedMessages = "";
+  messages.forEach(message => {
+    formattedMessages += formatMessage(message, nameInput.value);
+  });
+  chatBox.innerHTML = formattedMessages;
+}
+
+updateMessages;
+
+sendButton.addEventListener("click", function(event) {
+  event.preventDefault();
+  const sender = nameInput.value;
+  const message = myMessage.value;
+  sendMessages(sender, message);
+  myMessage.value = "";
+});
+
+const serverURL = `https://it3049c-chat.fly.dev/messages`;
+
+function fetchMessages() {
+  return fetch(serverURL)
+    .then(response => response.json());
+}
+
+async function updateMessages() {
+  const messages = await fetchMessages();
+  // ...
+}
+
+const MILLISECONDS_IN_TEN_SECONDS = 10000;
+setInterval(updateMessages, MILLISECONDS_IN_TEN_SECONDS);
+
+function sendMessages(username, text) {
+  const newMessage = {
+    sender: username,
+    text: text,
+    timestamp: new Date()
+  };
+
+  fetch(serverURL, {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newMessage)
+  });
 }
